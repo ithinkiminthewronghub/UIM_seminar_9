@@ -264,11 +264,14 @@ def faze_xor(cfg: ExperimentConfig) -> None:
 
     # ------------------------- UKOL: navrh vah a biasu ------------------------
     # Skryta vrstva (2 vstupy -> 2 jednotky y1, y2): sloupec j = vahy neuronu y_j.
-    w_hidden: np.ndarray | None = None      # np.array tvaru (2, 2)
-    b_hidden: np.ndarray | None = None      # np.array tvaru (2,)
-    # Vystupni vrstva (2 vstupy y1, y2 -> 1 jednotka).
-    w_output: np.ndarray | None = None      # np.array tvaru (2, 1)
-    b_output: np.ndarray | None = None      # np.array tvaru (1,)
+    factor = 4.0  # Zostření přechodu sigmoidy
+    w_hidden = np.array([[1.0, 1.0],
+                         [1.0, 1.0]]) * factor
+    b_hidden = np.array([-0.5, -1.5]) * factor
+
+    w_output = np.array([[1.0],
+                         [-1.0]]) * factor
+    b_output = np.array([-0.5]) * factor
     # --------------------------------------------------------------------------
 
     try:
@@ -312,11 +315,16 @@ def faze_trojuhelnik(cfg: ExperimentConfig) -> None:
 
     # ------------------------- UKOL: navrh vah a biasu ------------------------
     # Skryta vrstva (2 vstupy -> 3 jednotky, jedna na kazdou stranu).
-    w_hidden: np.ndarray | None = None      # np.array tvaru (2, 3)
-    b_hidden: np.ndarray | None = None      # np.array tvaru (3,)
-    # Vystupni vrstva (3 vstupy y1, y2, y3 -> 1 jednotka): AND tri polorovin.
-    w_output: np.ndarray | None = None      # np.array tvaru (3, 1)
-    b_output: np.ndarray | None = None      # np.array tvaru (1,)
+    # Fáze 4: Trojúhelník (příklad pro obecné 3 strany definující trojúhelník)
+    factor = 5.0
+    w_hidden = np.array([[1.0, -1.0, 0.0],
+                         [0.0, 1.0, -1.0]]) * factor
+    b_hidden = np.array([-1.0, -1.0, -1.0]) * factor
+
+    w_output = np.array([[1.0],
+                         [1.0],
+                         [1.0]]) * factor
+    b_output = np.array([-2.5]) * factor
     # --------------------------------------------------------------------------
 
     try:
@@ -357,14 +365,21 @@ def faze_motylek(cfg: ExperimentConfig) -> None:
 
     # ------------------------- UKOL: navrh vah a biasu ------------------------
     # 1. skryta vrstva (2 vstupy -> 2 jednotky y1, y2): dve poloroviny.
-    w_hidden_1: np.ndarray | None = None    # np.array tvaru (2, 2)
-    b_hidden_1: np.ndarray | None = None    # np.array tvaru (2,)
-    # 2. skryta vrstva (2 vstupy y1, y2 -> 2 jednotky u1, u2).
-    w_hidden_2: np.ndarray | None = None    # np.array tvaru (2, 2)
-    b_hidden_2: np.ndarray | None = None    # np.array tvaru (2,)
-    # Vystupni vrstva (2 vstupy u1, u2 -> 1 jednotka).
-    w_output: np.ndarray | None = None      # np.array tvaru (2, 1)
-    b_output: np.ndarray | None = None      # np.array tvaru (1,)
+    factor = 4.0
+    # 1. skrytá vrstva (poloroviny)
+    w_hidden_1 = np.array([[0.0, -1.0],
+                           [1.0, 1.0]]) * factor
+    b_hidden_1 = np.array([-0.5, 0.0]) * factor
+
+    # 2. skrytá vrstva (XOR nad polorovinami)
+    w_hidden_2 = np.array([[1.0, 1.0],
+                           [1.0, 1.0]]) * factor
+    b_hidden_2 = np.array([-0.5, -1.5]) * factor
+
+    # Výstupní vrstva
+    w_output = np.array([[1.0],
+                         [-1.0]]) * factor
+    b_output = np.array([-0.5]) * factor
     # --------------------------------------------------------------------------
 
     try:

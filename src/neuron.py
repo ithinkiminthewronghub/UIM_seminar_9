@@ -20,6 +20,7 @@ trida `Layer` neexistuje - neni potreba.
 from __future__ import annotations
 
 import numpy as np
+import os
 
 from src.activations import Activation, Sigmoid, make_activation
 from src.linear import Linear
@@ -41,11 +42,7 @@ class Neuron:
     fungoval beze zmeny.
     """
 
-    def __init__(
-        self,
-        linear: Linear,
-        activation: Activation,
-        ) -> None:
+    def __init__(self, linear: Linear, activation: Activation) -> None:
         """Ulozi slozenou afinni vrstvu a injektovanou aktivaci.
 
         Parametry
@@ -60,12 +57,12 @@ class Neuron:
         self.linear = linear
         self.activation = activation
 
-    def forward(self, x: np.ndarray) -> np.ndarray:
+    def forward(self, X: np.ndarray) -> np.ndarray:
         """Provede dopredny pruchod: afinni transformace, pak aktivace.
 
         Definice
         --------
-        z = self.linear.forward(x)
+        z = self.linear.forward(X)
         vystup = self.activation.forward(z)
 
         `Neuron` sam nepocita ani vazeny soucet, ani aktivaci - obe deleguje
@@ -73,32 +70,32 @@ class Neuron:
 
         Parametry
         ---------
-        x : np.ndarray
+        X : np.ndarray
             Matice vstupnich vzorku tvaru `(n_vzorku, n_priznaku)`.
 
         Navratova hodnota
         -----------------
         np.ndarray
             Vysledek `self.activation.forward` aplikovany na vystup
-            `self.linear.forward(x)`.
+            `self.linear.forward(X)`.
         """
-        z = self.linear.forward(x)
+        z = self.linear.forward(X)
         return self.activation.forward(z)
 
-    def __call__(self, x: np.ndarray) -> np.ndarray:
+    def __call__(self, X: np.ndarray) -> np.ndarray:
         """Zkratka pro `forward` - umoznuje volat instanci jako funkci.
 
         Parametry
         ---------
-        x : np.ndarray
+        X : np.ndarray
             Matice vstupnich vzorku predana primo do `forward`.
 
         Navratova hodnota
         -----------------
         np.ndarray
-            Vysledek `self.forward(x)`.
+            Vysledek `self.forward(X)`.
         """
-        return self.forward(x)
+        return self.forward(X)
 
     @property
     def weights(self) -> np.ndarray:
@@ -134,15 +131,22 @@ class Neuron:
             Cesta k vystupnimu .npz souboru.
         """
         # assert  Ověřte, že self.linear.weights je typu np.ndarray
-        raise NotImplementedError(
-            "Úkol: sestavte slovnik klicu {'weights':..., 'activation_name':...} "
-            "(pripadne 'bias' pokud self.linear.bias is not None a 'temperature' "
-            "pokud je self.activation instance Sigmoid) a ulozte ho pomoci "
-            "np.savez(path, **slovnik)."
-        )
+        assert isinstance(self.linear.weights, np.ndarray)
+
+        data = {
+            "weights": self.linear.weights,
+            "activation_name": type(self.activation).__name__,
+        }
+        if self.linear.bias is not None:
+            data["bias"] = np.array(self.linear.bias)
+
+        if isinstance(self.activation, Sigmoid):
+            data["temperature"] = np.array(self.activation.temperature)
+
+        np.savez(path, **data)
 
     @classmethod
-    def load(cls, path: str) -> Neuron:
+    def load(cls, path: str) -> "Neuron":
         """Nacte model ulozeny metodou `save` a vrati novou instanci `Neuron`.
 
         Presna inverze k `save`: `np.load(path)` vrati archiv, `weights`
@@ -165,9 +169,18 @@ class Neuron:
             puvodni neuron pred ulozenim.
         """
         # assert  Ověřte, že soubor path existuje (napr. os.path.exists)
-        raise NotImplementedError(
-            "Úkol: nactete archiv pres np.load(path), precte 'weights' a "
-            "volitelne 'bias' (None pokud klic chybi), sestavte Linear(weights, bias), "
-            "pomoci make_activation('activation_name'[, temperature=...]) sestavte "
-            "aktivaci a vratte cls(linear, activation)."
-        )
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Soubor {path} neexistuje.")
+
+        with np.load(path) as archiv:
+            weights = archiv["weights"]
+            bias = float(archiv["bias"]) if "bias" in archiv else None
+            activation_name = str(archiv["activation_name"])
+
+            kwargs = {}
+            if "temperature" in archiv:
+                kwargs["temperature"] = float(archiv["temperature"])
+
+            linear = Linear(weights=weights, bias=bias)
+            activation = make_activation(activation_name, **kwargs)
+            return cls(linear=linear, activation=activation)

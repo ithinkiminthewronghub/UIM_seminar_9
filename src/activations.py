@@ -104,10 +104,12 @@ class Step(Activation):
         """
         # assert  Ověřte, že x je typu np.ndarray
         # assert  Ověřte, že vystup obsahuje jen hodnoty 0.0 a 1.0
-        raise NotImplementedError(
-            "Úkol: implementujte f(x) = 1 pro x >= 0, jinak 0, vektorizovane "
-            "pomoci np.where (zadna python smycka pres prvky x)."
-        )
+        assert isinstance(x, np.ndarray)
+        result = np.where(x>=0, 1.0, 0.0)
+        assert np.isin(result, [0.0, 1.0]).all()
+
+        return result
+
 
     @property
     def output_range(self) -> tuple[float, float]:
@@ -119,9 +121,10 @@ class Step(Activation):
             Konstantni dvojice `(0.0, 1.0)`.
         """
         # assert  Ověřte, že vracite tuple dvou float hodnot, ne list ani int
-        raise NotImplementedError(
-            "Úkol: vratte konstantni tuple (0.0, 1.0) jako obor hodnot Step aktivace."
-        )
+        result = (0.0, 1.0)
+        assert isinstance(result, tuple) and isinstance(result[0], float) and isinstance(result[1], float)
+
+        return result
 
 
 class Sigmoid(Activation):
@@ -166,10 +169,10 @@ class Sigmoid(Activation):
         """
         # assert  Ověřte, že x je typu np.ndarray
         # assert  Ověřte, že self.temperature je kladne cislo
-        raise NotImplementedError(
-            "Úkol: implementujte f(x) = 1 / (1 + exp(-x / self.temperature)) "
-            "pomoci np.exp, vektorizovane pres cele pole x."
-        )
+        assert isinstance(x, np.ndarray)
+        assert self.temperature > 0.0
+
+        return 1.0/(1 + np.exp(-x / self.temperature))
 
     @property
     def output_range(self) -> tuple[float, float]:
@@ -181,9 +184,10 @@ class Sigmoid(Activation):
             Konstantni dvojice `(0.0, 1.0)`.
         """
         # assert  Ověřte, že vracite tuple dvou float hodnot, ne list ani int
-        raise NotImplementedError(
-            "Úkol: vratte konstantni tuple (0.0, 1.0) jako obor hodnot Sigmoid aktivace."
-        )
+        result = (0.0, 1.0)
+        assert isinstance(result, tuple) and isinstance(result[0], float) and isinstance(result[1], float)
+
+        return result
 
 
 class Tanh(Activation):
@@ -212,10 +216,8 @@ class Tanh(Activation):
             Pole stejneho tvaru jako `x` s hodnotami v otevrenem intervalu (-1.0, 1.0).
         """
         # assert  Ověřte, že x je typu np.ndarray
-        raise NotImplementedError(
-            "Úkol: implementujte f(x) = tanh(x) pomoci np.tanh, vektorizovane "
-            "pres cele pole x."
-        )
+        assert isinstance(x, np.ndarray)
+        return np.tanh(x)
 
     @property
     def output_range(self) -> tuple[float, float]:
@@ -227,9 +229,10 @@ class Tanh(Activation):
             Konstantni dvojice `(-1.0, 1.0)`.
         """
         # assert  Ověřte, že vracite tuple dvou float hodnot, ne list ani int
-        raise NotImplementedError(
-            "Úkol: vratte konstantni tuple (-1.0, 1.0) jako obor hodnot Tanh aktivace."
-        )
+        result = (-1.0, 1.0)
+        assert isinstance(result, tuple) and isinstance(result[0], float) and isinstance(result[1], float)
+
+        return result
 
 
 class ReLU(Activation):
@@ -258,10 +261,8 @@ class ReLU(Activation):
             Pole stejneho tvaru jako `x` s hodnotami v intervalu [0.0, +inf).
         """
         # assert  Ověřte, že x je typu np.ndarray
-        raise NotImplementedError(
-            "Úkol: implementujte f(x) = max(0, x) pomoci np.maximum, "
-            "vektorizovane pres cele pole x."
-        )
+        assert isinstance(x, np.ndarray)
+        return np.maximum(0, x)
 
     @property
     def output_range(self) -> tuple[float, float]:
@@ -273,9 +274,10 @@ class ReLU(Activation):
             Konstantni dvojice `(0.0, np.inf)`.
         """
         # assert  Ověřte, že horni mez je +nekonecno (np.inf), ne konecne cislo
-        raise NotImplementedError(
-            "Úkol: vratte konstantni tuple (0.0, np.inf) jako obor hodnot ReLU aktivace."
-        )
+        result = (0.0, np.inf)
+        assert result[1] == np.inf
+
+        return result
 
 
 class ReLU6(Activation):
@@ -305,10 +307,8 @@ class ReLU6(Activation):
             Pole stejneho tvaru jako `x` s hodnotami v intervalu [0.0, 6.0].
         """
         # assert  Ověřte, že x je typu np.ndarray
-        raise NotImplementedError(
-            "Úkol: implementujte f(x) = min(max(0, x), 6) pomoci np.clip "
-            "(nebo kombinace np.minimum/np.maximum), vektorizovane pres cele pole x."
-        )
+        assert isinstance(x, np.ndarray)
+        return np.clip(np.maximum(0.0, x), 0.0, 6.0)
 
     @property
     def output_range(self) -> tuple[float, float]:
@@ -320,9 +320,10 @@ class ReLU6(Activation):
             Konstantni dvojice `(0.0, 6.0)`.
         """
         # assert  Ověřte, že vracite tuple dvou float hodnot, ne list ani int
-        raise NotImplementedError(
-            "Úkol: vratte konstantni tuple (0.0, 6.0) jako obor hodnot ReLU6 aktivace."
-        )
+        result = (0.0, 6.0)
+        assert isinstance(result, tuple) and isinstance(result[0], float) and isinstance(result[1], float)
+
+        return result
 
 
 # Registr jmen aktivaci na tridy - podklad pro `make_activation` nize.

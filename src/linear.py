@@ -68,11 +68,12 @@ class Linear:
         """
         # assert  Ověřte, že x je 2D pole (ma atribut ndim == 2)
         # assert  Ověřte, že x.shape[1] odpovida prvnimu rozmeru self.weights
-        raise NotImplementedError(
-            "Úkol: spocitejte z = x @ self.weights + (self.bias if self.bias "
-            "is not None else 0.0) a vratte ho - zadnou aktivaci zde neaplikujte, "
-            "Linear pocita jen afinni transformaci."
-        )
+        assert x.ndim == 2
+        assert x.shape[1] == self.weights.shape[0]
+
+        b = self.bias if self.bias is not None else 0.0
+        return x @ self.weights + b
+
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
         """Zkratka pro `forward` - umoznuje volat instanci jako funkci.

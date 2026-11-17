@@ -76,11 +76,15 @@ class Sequential:
         """
         # assert  Ověřte, že seznam self.layers neni prazdny
         # assert  Ověřte, že x je 2D pole (n_vzorku, n_priznaku)
-        raise NotImplementedError(
-            "Úkol: nastavte self.io_ = [x]; pro kazdou vrstvu v self.layers "
-            "spocitejte vystup z posledniho prvku self.io_ (out = layer(self.io_[-1])) "
-            "a pripojte ho na konec self.io_; vratte self.io_[-1]."
-        )
+        assert len(self.layers) > 0, "Seznam vrstev (layers) nesmí být prázdný."
+        assert isinstance(x, np.ndarray) and x.ndim == 2, "Vstup x musí být 2D NumPy pole tvaru (n_vzorku, n_priznaku)."
+
+        self.io_ = [x]
+        for layer in self.layers:
+            out = layer(self.io_[-1])
+            self.io_.append(out)
+
+        return self.io_[-1]
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
         """Zkratka pro `forward` - umoznuje volat instanci jako funkci.
